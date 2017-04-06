@@ -1,0 +1,1 @@
+/usr/bin/c++      CMakeFiles/BingRequest.dir/bingrequest.o  -o BingRequest -rdynamic 

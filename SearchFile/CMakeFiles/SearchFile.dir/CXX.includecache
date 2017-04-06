@@ -1,0 +1,16 @@
+#IncludeRegexLine: ^[ 	]*#[ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/opt/casablanca/Release/samples/SearchFile/searchfile.cpp
+cpprest/filestream.h
+/opt/casablanca/Release/samples/SearchFile/cpprest/filestream.h
+cpprest/containerstream.h
+/opt/casablanca/Release/samples/SearchFile/cpprest/containerstream.h
+cpprest/producerconsumerstream.h
+/opt/casablanca/Release/samples/SearchFile/cpprest/producerconsumerstream.h
+
