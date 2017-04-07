@@ -28,12 +28,35 @@ int main(int argc, char *argv[])
   auto fileStream = std::make_shared<ostream>();
 
   // open stream to output file
-  pplx::task<void> requestTask = 
-        fstream::open_ostream(U(argv[2])).then([=](ostream outFile)
+   
+  fstream::open_ostream(U(argv[2])).then([=](ostream outFile) -> pplx::task<http_response>
   {
      *fileStream = outFile;
 
-  });
+     // create http_client to send the request
+     http_client client(U("http://www.google.com/"));
+
+     // build request URI and start the request
+     uri_builder builder(U("/search"));
+     builder.append_query(U("q"), U(argv[1]));
+     return client.request(methods::GET, builder.to_string()); 
+
+  })
+  // handle response headers arriving
+  .then([=](http_response response) -> pplx::task<size_t> 
+  {
+     printf("Received response status code:%u\n", response.status_code());
+
+     // write response bodyinto the file
+     return response.body().read_to_end(fileStream->streambuf());
+  })
+  // close the file stream
+  .then([=](size_t)
+  {
+     return fileStream->close();
+  })
+  // wait for the entire response body tobe written to a file
+  .wait();
 
   
 
