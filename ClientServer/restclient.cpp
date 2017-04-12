@@ -1,6 +1,6 @@
 #include <cpprest/http_client.h>
 #include <cpprest/json.h>
-#pragma comment(lib, "cpprest110_1_1")
+#pragma comment(lib, "cpprest290_1_1")
 
 using namespace web;
 using namespace web::http;

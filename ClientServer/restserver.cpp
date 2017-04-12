@@ -1,6 +1,6 @@
 #include <cpprest/http_listener.h>
 #include <cpprest/json.h>
-#pragma comment(lib, "cpprest110_1_1")
+#pragma comment(lib, "cpprest290_1_1")
 
 using namespace web;
 using namespace web::http;
@@ -13,7 +13,7 @@ using namespace web::http::experimental::listener;
 using namespace std;
 
 #define TRACE(msg)	cout << msg
-#define TRACE_ACTION(a, k, v) cout << a << " (" << k << ", " << v << ")\n"
+#define TRACE_ACTION(a, k, v) cout << a << u8" (" << k << u8", " << v << u8")\n"
 
 map<utility::string_t, utility::string_t> dictionary;
 
@@ -25,7 +25,7 @@ void handle_del(http_request request);
 
 int main()
 {
-   utility::string_t uri_str = "http://localhost/restdemo";
+   utility::string_t uri_str = u8"http://localhost/restdemo";
    uri myuri(uri_str);
    http_listener mylistener(myuri);
 
@@ -38,14 +38,14 @@ int main()
    {
      mylistener
         .open()
-        .then([&mylistener](){TRACE("\nstarting to listen\n");})
+        .then([&mylistener](){TRACE(u8"\nstarting to listen\n");})
         .wait();
 
      while (true);
    }
    catch (exception const & e)
    {
-     wcout << e.what() << endl;
+     cout << e.what() << endl;
    }
 
    return 0;
@@ -56,7 +56,7 @@ int main()
 
 void handle_get(http_request request)
 {
-  TRACE("\nhandle GET\n");
+  TRACE(u8"\nhandle GET\n");
 
   json::value answer;
 
@@ -87,7 +87,7 @@ void handle_request(http_request request,
           }
           catch (http_exception const & e)
           {
-             wcout << e.what() << endl;
+             cout << e.what() << endl;
           }
        })
        .wait();
@@ -97,7 +97,7 @@ void handle_request(http_request request,
 
 void handle_post(http_request request)
 {
-   TRACE("\nhandle POST\n");
+   TRACE(u8"\nhandle POST\n");
 
    handle_request(
        request,
@@ -111,7 +111,7 @@ void handle_post(http_request request)
                auto pos = dictionary.find(key);
                if (pos == dictionary.end())
                {
-                 answer[key] = json::value::string("<nil>");
+                 answer[key] = json::value::string(u8"<nil>");
                }
                else
                {
@@ -125,7 +125,7 @@ void handle_post(http_request request)
 
 void handle_put(http_request request)
 {
-   TRACE("\nhandle PUT\n");
+   TRACE(u8"\nhandle PUT\n");
 
    handle_request(
        request,
@@ -140,13 +140,13 @@ void handle_put(http_request request)
 
                   if (dictionary.find(key) == dictionary.end())
                   {
-                     TRACE_ACTION("added", key, value);
-                     answer[key] = json::value::string("<put>");
+                     TRACE_ACTION(u8"added", key, value);
+                     answer[key] = json::value::string(u8"<put>");
                   }
                   else
                   {
-                     TRACE_ACTION("updated", key, value);
-                     answer[key] = json::value::string("<updated>");
+                     TRACE_ACTION(u8"updated", key, value);
+                     answer[key] = json::value::string(u8"<updated>");
                   }
 
                   dictionary[key] = value.as_string();
@@ -159,7 +159,7 @@ void handle_put(http_request request)
 
 void handle_del(http_request request)
 {
-   TRACE("\nhandle DEL\n");
+   TRACE(u8"\nhandle DEL\n");
 
    handle_request(
        request,
@@ -174,12 +174,12 @@ void handle_del(http_request request)
                 auto pos = dictionary.find(key);
                 if (pos == dictionary.end())
                 {
-                   answer[key] = json::value::string("<failed>");
+                   answer[key] = json::value::string(u8"<failed>");
                 }
                 else
                 {
-                   TRACE_ACTION("deleted", pos->first, pos->second);
-                   answer[key] = json::value::string("<deleted>");
+                   TRACE_ACTION(u8"deleted", pos->first, pos->second);
+                   answer[key] = json::value::string(u8"<deleted>");
                    keys.insert(key); 
                 }
              }
