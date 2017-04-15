@@ -13,9 +13,9 @@ void display_field_map_json(json::value & jvalue)
 {
    if (!jvalue.is_null())
    {
-      for (auto const & e : jvalue)
+      for (auto const & e : jvalue.as_object())
       {
-        wcout << e.first.as_string() << L" : " << e.second.as_string() << endl;
+        cout << e.first << L" : " << e.second << endl;
       }
 
    }
@@ -28,12 +28,12 @@ pplx::task<http_response> make_task_request(http_client & client,
  					    json::value const & jvalue)
 {
    return (mtd == methods::GET || mtd == methods::HEAD) ?
-      client.request(mtd, L"/restdemo") :
-      client.request(mtd, L"/restdemo", jvalue);
+      client.request(mtd, u8"/restdemo") :
+      client.request(mtd, u8"/restdemo", jvalue);
 }
 
 
-void make_request(http_client & client, method mtd, json::value cons & jvalue)
+void make_request(http_client & client, method mtd, json::value const & jvalue)
 {
   make_task_request(client, mtd, jvalue)
       .then([](http_response response)
@@ -48,11 +48,12 @@ void make_request(http_client & client, method mtd, json::value cons & jvalue)
       {
          try
          {
-            display_field_map_json(previousTask.get());
+            json::value temp =previousTask.get();
+            display_field_map_json(temp);
          }
          catch (http_exception const & e)
          {
-           wcout << e.what() << endl;
+           cout << e.what() << endl;
          }
       })
       .wait();
@@ -60,33 +61,33 @@ void make_request(http_client & client, method mtd, json::value cons & jvalue)
 
 int main()
 {
-   http_client client(U("http://localhost"));
+   http_client client(u8"http://localhost:34568/restdemo");
    
-   json::value::field_map putvalue;
-   putvalue.push_back(make_pair(json::value(L"one"), json::value(L"100")));
-   putvalue.push_back(make_pair(json::value(L"two"), json::value(L"200")));
+   json::value putvalue;
+   putvalue[u8"one"]= json::value::string(u8"100");
+   putvalue[u8"two"]= json::value::string(u8"200");
 
-   wcout << L"\input values\n";
-   make_request(client, methods::PUT, json::value::object(putvalue));
+   cout << u8"\ninput values\n";
+   make_request(client, methods::PUT, putvalue);
 
    auto getvalue = json::value::array();
-   getvalue[0] = json::value(L"one");
-   getvalue[1] = json::value(L"two");
-   getvalue[2] = json::value(L"three");
+   getvalue[0] = json::value(u8"one");
+   getvalue[1] = json::value(u8"two");
+   getvalue[2] = json::value(u8"three");
 
-   wcout << L"\nget values (POST)\n";
+   wcout << u8"\nget values (POST)\n";
    make_request(client, methods::POST, getvalue);
 
    auto delvalue = json::value::array();
-   delvalue[0] = json::value(L"one");
+   delvalue[0] = json::value(u8"one");
   
-   wcout << L"\ndelete values\n";
+   wcout << u8"\ndelete values\n";
    make_request(client, methods::DEL, delvalue);
 
-   wcout << L"\nget values (POST)\n";
+   wcout << u8"\nget values (POST)\n";
    make_request(client, methods::POST, getvalue); 
 
-   wcout << L"\nget values (GET)\n";
+   wcout << u8"\nget values (GET)\n";
    make_request(client, methods::GET, json::value::null());
 
    return 0;

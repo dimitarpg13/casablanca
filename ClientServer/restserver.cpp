@@ -27,7 +27,7 @@ int main()
 {
    utility::string_t uri_str = u8"http://localhost/restdemo";
    uri myuri(uri_str);
-   http_listener mylistener(myuri);
+   http_listener mylistener(u8"http://localhost:34568/restdemo");
 
    mylistener.support(methods::GET, handle_get);
    mylistener.support(methods::POST, handle_post);
